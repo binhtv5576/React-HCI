@@ -105,7 +105,7 @@ const Container = createStackNavigator(
     }
   },
   {
-    initialRouteName: "Calendar"
+    initialRouteName: "Account"
   }
 );
 export default Container;

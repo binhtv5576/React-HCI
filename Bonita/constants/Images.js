@@ -13,6 +13,7 @@ const SPA = require("../assets/imgs/download.png");
 const LAM_NAILS = require("../assets/imgs/nails.jpg");
 const LAM_TOC = require("../assets/imgs/catoc.jpg");
 const MAKE_UP = require("../assets/imgs/makeup.png");
+const PLUS = require("../assets/imgs/plus-flat.png");
 
 export default {
   Onboarding,
@@ -29,5 +30,6 @@ export default {
   SPA,
   LAM_NAILS,
   LAM_TOC,
-  MAKE_UP
+  MAKE_UP,
+  PLUS
 };

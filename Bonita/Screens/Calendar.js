@@ -6,7 +6,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Alert,
-  FlatList
+  FlatList,
+  AsyncStorage
 } from "react-native";
 import { Block, Checkbox, Text, theme } from "galio-framework";
 import { Images, argonTheme } from "../constants";
@@ -33,13 +34,34 @@ export default class ViewCalendar extends Component {
           id: 1,
           name: "Mừng 20 tháng 11",
           time: "20-11",
-          chinhanh: "Nam kỳ khởi nghĩa"
+          chinhanh: "Nam kỳ khởi nghĩa",
+          description: "Nhanh tay nhận ngay 50% giảm giá",
+          timeSlot: 3,
+          perSlot: 1
         }
       ]
     };
     this.onDateChange = this.onDateChange.bind(this);
+    this.dataVM = {
+      id: 1,
+      name: "",
+      time: "",
+      chinhanh: "",
+      description: "",
+      timeSlot: 0,
+      perSlot: 0
+    };
   }
 
+  dataVM = {
+    id: 1,
+    name: "",
+    time: "",
+    chinhanh: "",
+    description: "",
+    timeSlot: 0,
+    perSlot: 0
+  };
   onDateChange(date, type) {
     if (type === "END_DATE") {
       this.setState({
@@ -55,13 +77,24 @@ export default class ViewCalendar extends Component {
   showSate() {
     console.log(this.state);
   }
+
+  createdata = async () => {
+    this.dataVM.id = Math.floor(Math.random() * 1000);
+
+    await this.setState(state => {
+      const data = state.data.concat(this.dataVM);
+      return {
+        data
+      };
+    });
+  };
   renderItem = ({ item }) => {
     return (
       <Block
         key={item.id}
         style={{
           width: width * 0.95,
-          height: 90,
+          height: 160,
           borderColor: "#00c4cc",
           borderWidth: 0.9,
           borderRadius: 4,
@@ -72,7 +105,7 @@ export default class ViewCalendar extends Component {
           center
           row
           style={{
-            height: 30
+            height: 25
           }}
         >
           <Block right style={{ width: width * 0.3 }}>
@@ -86,7 +119,7 @@ export default class ViewCalendar extends Component {
           center
           row
           style={{
-            height: 30
+            height: 25
           }}
         >
           <Block right style={{ width: width * 0.3 }}>
@@ -100,7 +133,7 @@ export default class ViewCalendar extends Component {
           center
           row
           style={{
-            height: 30
+            height: 25
           }}
         >
           <Block right style={{ width: width * 0.3 }}>
@@ -108,6 +141,48 @@ export default class ViewCalendar extends Component {
           </Block>
           <Block style={{ width: width * 0.6, marginLeft: width * 0.1 }}>
             <Text>{item.chinhanh}</Text>
+          </Block>
+        </Block>
+        <Block
+          center
+          row
+          style={{
+            height: 25
+          }}
+        >
+          <Block right style={{ width: width * 0.3 }}>
+            <Text>Thời gian/slot:</Text>
+          </Block>
+          <Block style={{ width: width * 0.6, marginLeft: width * 0.1 }}>
+            <Text>{item.timeSlot}</Text>
+          </Block>
+        </Block>
+        <Block
+          center
+          row
+          style={{
+            height: 25
+          }}
+        >
+          <Block right style={{ width: width * 0.3 }}>
+            <Text>Người/slot:</Text>
+          </Block>
+          <Block style={{ width: width * 0.6, marginLeft: width * 0.1 }}>
+            <Text>{item.perSlot}</Text>
+          </Block>
+        </Block>
+        <Block
+          center
+          row
+          style={{
+            height: 25
+          }}
+        >
+          <Block right style={{ width: width * 0.3 }}>
+            <Text>Miêu tả:</Text>
+          </Block>
+          <Block style={{ width: width * 0.6, marginLeft: width * 0.1 }}>
+            <Text>{item.description}</Text>
           </Block>
         </Block>
       </Block>
@@ -122,6 +197,11 @@ export default class ViewCalendar extends Component {
     let TimeStart = this.state.selectedStartDate;
     const { elements } = this.state;
 
+    if (this.state.selectedEndDate == null) {
+      this.dataVM.time = TimeStart;
+    } else {
+      this.dataVM.time = TimeEnd;
+    }
     return (
       <ScrollView>
         <KeyboardAwareScrollView>
@@ -131,7 +211,7 @@ export default class ViewCalendar extends Component {
             style={{
               ...styles.registerContainer,
               zIndex: 1,
-              height: height * 1.5
+              height: height * 1.3
             }}
           >
             <Block
@@ -193,7 +273,8 @@ export default class ViewCalendar extends Component {
                     marginTop: 30,
                     borderColor: "#00c4cc",
                     borderRadius: 4,
-                    borderWidth: 0.5
+                    borderWidth: 0.5,
+                    marginLeft: 10
                   }}
                 >
                   <CalendarPicker
@@ -229,7 +310,9 @@ export default class ViewCalendar extends Component {
                       tintColor={"#666666"}
                       activityTintColor={"green"}
                       handler={(selection, row) =>
-                        this.setState({ text: data[selection][row] })
+                        // this.setState({ text: data[selection][row] })
+                        // console.log(data[selection][row])
+                        (this.dataVM.chinhanh = data[selection][row])
                       }
                       data={data}
                     ></DropdownMenu>
@@ -254,6 +337,7 @@ export default class ViewCalendar extends Component {
                     }}
                   >
                     <Input
+                      onChange={content => (this.dataVM.name = content)}
                       right
                       style={{ width: (width * 4) / 7 }}
                       placeholder="Ví dụ : Khuyến mãi 20/11"
@@ -280,6 +364,7 @@ export default class ViewCalendar extends Component {
                     }}
                   >
                     <Input
+                      onChange={content => (this.dataVM.description = content)}
                       right
                       style={{ width: (width * 4) / 7 }}
                       placeholder="Ví dụ : tặng 50% cho đợt cắt tóc"
@@ -339,6 +424,7 @@ export default class ViewCalendar extends Component {
                   >
                     <Input
                       right
+                      onChange={e => (this.dataVM.timeSlot = e)}
                       keyboardType="numeric"
                       style={{ width: (width * 4) / 7 }}
                       placeholder="Đơn vị Phút"
@@ -367,19 +453,22 @@ export default class ViewCalendar extends Component {
                     <Input
                       right
                       keyboardType="numeric"
+                      onChange={e => (this.dataVM.perSlot = e)}
                       style={{ width: (width * 4) / 7 }}
                       placeholder="Đơn vị Người"
                       iconContent={<Block />}
                     />
                   </Block>
                 </Block>
-                <Button
-                  center
-                  onPress={this.submitService}
-                  style={{ backgroundColor: "#00c4cc", marginTop: 15 }}
-                >
-                  <Text style={{ fontSize: 15 }}>Xác nhận</Text>
-                </Button>
+                <Block center style={{ width: width }}>
+                  <Button
+                    onPress={this.createdata}
+                    // onPress={() => this.createdata}
+                    style={{ backgroundColor: "#00c4cc", marginTop: 15 }}
+                  >
+                    <Text style={{ fontSize: 15 }}>Xác nhận</Text>
+                  </Button>
+                </Block>
               </Block>
             ) : (
               <>
